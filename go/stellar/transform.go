@@ -195,6 +195,7 @@ func transformPaymentRelay(mctx libkb.MetaContext, acctID stellar1.AccountID, p 
 
 	loc.ToAssertion = p.ToAssertion
 	loc.ToType = stellar1.ParticipantType_SBS
+	toName := loc.ToAssertion
 	if p.To != nil {
 		username, err := lookupUsername(mctx, p.To.Uid)
 		if err != nil {
@@ -203,6 +204,7 @@ func transformPaymentRelay(mctx libkb.MetaContext, acctID stellar1.AccountID, p 
 		}
 		loc.ToUsername = username
 		loc.ToType = stellar1.ParticipantType_KEYBASE
+		toName = username
 	}
 
 	if p.TxStatus != stellar1.TransactionStatus_SUCCESS {
@@ -212,7 +214,7 @@ func transformPaymentRelay(mctx libkb.MetaContext, acctID stellar1.AccountID, p 
 	} else {
 		loc.StatusSimplified = stellar1.PaymentStatus_CLAIMABLE
 		if isSender {
-			loc.StatusDetail = "Waiting for the recipient to open the app to claim, or the sender to cancel."
+			loc.StatusDetail = fmt.Sprintf("%v can claim this when they set up their wallet.", toName)
 			loc.ShowCancel = true
 		}
 	}

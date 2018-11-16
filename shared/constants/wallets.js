@@ -212,6 +212,7 @@ const _defaultPaymentCommon = {
   statusDescription: '',
   statusDetail: '',
   statusSimplified: 'none',
+  showCancel: false,
   target: '',
   targetAccountID: '',
   targetType: '',

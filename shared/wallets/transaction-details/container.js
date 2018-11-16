@@ -63,7 +63,7 @@ const mergeProps = (stateProps, dispatchProps, ownProps) => {
     loading: false,
     memo: tx.note.stringValue(),
     onBack: dispatchProps.navigateUp,
-    onCancelPayment: tx.statusSimplified === 'cancelable' ? dispatchProps.onCancelPayment : null,
+    onCancelPayment: tx.showCancel ? dispatchProps.onCancelPayment : null,
     onCancelPaymentWaitingKey: Constants.cancelPaymentWaitingKey(tx.id),
     onChat: dispatchProps.onChat,
     onLoadPaymentDetail: dispatchProps.onLoadPaymentDetail,
