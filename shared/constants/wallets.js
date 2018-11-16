@@ -318,6 +318,7 @@ const rpcPaymentToPaymentCommon = (p: RPCTypes.PaymentLocal | RPCTypes.PaymentDe
     statusDescription: p.statusDescription,
     statusDetail: p.statusDetail,
     statusSimplified: serviceStatusSimplfied === 'claimable' ? 'cancelable' : serviceStatusSimplfied,
+    showCancel: p.showCancel,
     target,
     targetAccountID: p.toAccountID,
     targetType,

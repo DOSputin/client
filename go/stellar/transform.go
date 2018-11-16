@@ -172,9 +172,11 @@ func transformPaymentRelay(mctx libkb.MetaContext, acctID stellar1.AccountID, p 
 	if err != nil {
 		return nil, err
 	}
-	// Hack: newPaymentLocal doesn't calculate delta right for relays and gui kills wallet tab when it sees NONE for relays.
+
+	isSender := p.From.Uid.Equal(mctx.G().GetMyUID())
+
 	loc.Delta = stellar1.BalanceDelta_INCREASE
-	if p.From.Uid.Equal(mctx.G().GetMyUID()) {
+	if isSender {
 		loc.Delta = stellar1.BalanceDelta_DECREASE
 	}
 
@@ -184,11 +186,12 @@ func transformPaymentRelay(mctx libkb.MetaContext, acctID stellar1.AccountID, p 
 	}
 
 	loc.FromAccountID = p.FromStellar
-	loc.FromType = stellar1.ParticipantType_STELLAR
-	if username, err := lookupUsername(mctx, p.From.Uid); err == nil {
-		loc.FromUsername = username
-		loc.FromType = stellar1.ParticipantType_KEYBASE
+	loc.FromUsername, err = lookupUsername(mctx, p.From.Uid)
+	if err != nil {
+		mctx.CDebugf("sender lookup failed: %s", err)
+		return nil, errors.New("sender lookup failed")
 	}
+	loc.FromType = stellar1.ParticipantType_KEYBASE
 
 	loc.ToAssertion = p.ToAssertion
 	loc.ToType = stellar1.ParticipantType_SBS
@@ -203,13 +206,15 @@ func transformPaymentRelay(mctx libkb.MetaContext, acctID stellar1.AccountID, p 
 	}
 
 	if p.TxStatus != stellar1.TransactionStatus_SUCCESS {
-		// If the funding tx is not complete
+		// The funding tx is not complete.
 		loc.StatusSimplified = p.TxStatus.ToPaymentStatus()
 		loc.StatusDetail = p.TxErrMsg
 	} else {
 		loc.StatusSimplified = stellar1.PaymentStatus_CLAIMABLE
-		loc.StatusDetail = "Waiting for the recipient to open the app to claim, or the sender to cancel."
-		loc.ShowCancel = true
+		if isSender {
+			loc.StatusDetail = "Waiting for the recipient to open the app to claim, or the sender to cancel."
+			loc.ShowCancel = true
+		}
 	}
 	if p.Claim != nil {
 		loc.StatusSimplified = p.Claim.ToPaymentStatus()

@@ -260,7 +260,7 @@ export const TimestampError = (props: TimestampErrorProps) => (
 )
 
 export const TimestampPending = () => (
-  <Text type="BodySmall">The Stellar network hasn't confirmed your transaction.</Text>
+  <Text type="BodySmall">The Stellar network hasnt confirmed your transaction.</Text>
 )
 
 type TimestampLineProps = {|
